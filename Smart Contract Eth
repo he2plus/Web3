@@ -1,0 +1,65 @@
+//SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract CrowdFunding{
+
+ uint public projectCount;
+
+ mapping(uint=>Project) public idtoProjects;
+
+ struct project{
+     uint projectid;
+     address creator;
+     string title;
+     uint Goalamount;
+     uint currentamount;
+     bool reachedgoal;
+ }
+
+  function createProject(string memory _title, uint _goalamount) public {
+      require( _goalamount>0,"Goal Amount Shoould be GREATER THAN 0");
+      Project storage currProject = idToProjects[projectCount];
+      currProject.projectid = projectCount;
+      currProject.creator = msg.sender;
+      currProject.title = _title;
+      currProject.goalamount = _goalamount;
+      currProject.creator = msg.sender;
+      
+      projectCount++;
+  }
+  function contribute(uint _projectid) public payable {
+      Project storage currProject = idtoProjectsToProjects[_projectid];
+      
+      require(!currProject.reachedgoal, "Goal has been reached");
+      require(msg.value>0,"Contribution should be greater than 0");
+
+      currProject.currentamount += msg.value;
+      if(currProject.currentamount>=currProject.goalAmount){
+          currProject.reachedGoal = true;
+      }
+  }
+
+      function withdrawfunds(uint _projectid) public {
+          Project storage currProject = idtoProjects[_projectid];
+          require(msg.sender==currProject.creator,"You are not the creatpor");
+          require(currProject.reachedGooal,"Your project has not reached the goal ");
+          payable(msg.sender).tranfer(cutrProject.currAmount);
+          currProject.currentAmount=0;
+
+      }
+
+      function getProjects() public view returns(Project[] memory){
+          Project[ storage projecctsArr = new Project[](projectCount)]
+          for(uint i=0; i<projectCount; i++){
+              Project storage currProject = idtoProjects[i];
+              projectsarr[i].projectid = currProject.projectid;
+              projectsarr[i].creator = currProject.creator;
+              projectsarr[i].goalamount = currProject.goalamount;
+              projectsarr[i].currentamount = currProject.currentamount;
+              projectsarr[i].reachedgoal = currProject.reachedgoal;
+
+          }
+          return  projectsArr;
+      }
+  }
+ }
